@@ -1,5 +1,8 @@
 <aside>
-    <form action="get">
-
+    <form method="get">
+        <h2>Filters</h2>
+        <hr>
+        {{ filter_form.as_p }}
+        <button type="submit">Apply filters</button>
     </form>
 </aside>
