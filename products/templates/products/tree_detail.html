@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <div>
+        <img src="{{ tree.image.url }}" alt="{{ tree.name }}">
+        <h2>{{ tree.name }}</h4>
+        <p>Tree type: {{ tree.tree_type }}</p>
+        <p>Color: {{ tree.color }}</p>
+        <p>
+            Decorations: 
+            {% for deco in tree.decorations.all %}
+                {{ deco.name }}
+                {% if not forloop.last %}, {% endif %}
+            {% empty %}
+                No decorations
+            {% endfor %}
+        </p>
+        <p>Height: {{ tree.height }}</p>
+        <p>{% if tree.artificial %}Artificial{% else %}Real{% endif %}</p>
+        <h3>Price: {{ tree.price }}</h5>
+        <p>{{ tree.description }}</p>
+    </div>
+</main>
+{% endblock content %}

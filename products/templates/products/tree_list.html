@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <div class="card-container">
+    {% for tree in object_list %}
+        <a href="{% url "products:tree-detail" tree.id %}">
+            <div class="card">
+                <img src="{{ tree.image.url }}" alt="{{ tree.name }}">
+                <h4>{{ tree.name }}</h4>
+                <p>{{ tree.tree_type }}</p>
+                <p>{{ tree.color }}</p>
+                <p>{{ tree.description|truncatewords:10 }}</p>
+                <h5>{{ tree.price }}</h5>
+            </div>
+        </a>
+    {% endfor %}
+    </div>
+</main>
+{% endblock content %}
