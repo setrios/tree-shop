@@ -7,7 +7,7 @@
 
     <div class="card-container">
     {% for tree in object_list %}
-        <a href="{% url "products:tree-detail" tree.id %}">
+        <a href="{% url "products:tree_detail" tree.id %}">
             <div class="card">
                 <img src="{{ tree.image.url }}" alt="{{ tree.name }}">
                 <h4>{{ tree.name }}</h4>

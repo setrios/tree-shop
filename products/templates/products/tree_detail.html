@@ -4,7 +4,7 @@
 <main>
     <div>
         <img src="{{ tree.image.url }}" alt="{{ tree.name }}">
-        <h2>{{ tree.name }}</h4>
+        <h2>{{ tree.name }}</h2>
         <p>Tree type: {{ tree.tree_type }}</p>
         <p>Color: {{ tree.color }}</p>
         <p>
@@ -18,8 +18,55 @@
         </p>
         <p>Height: {{ tree.height }}</p>
         <p>{% if tree.artificial %}Artificial{% else %}Real{% endif %}</p>
-        <h3>Price: {{ tree.price }}</h5>
+        <h3>Price: {{ tree.price }}</h3>
+        <button value="{{ tree.id }}" id="add-cart">Add To Cart</button>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> <!-- for correct AJAX send -->
         <p>{{ tree.description }}</p>
     </div>
 </main>
+
+<!-- sending AJAX  with vanilla JS -->
+<script type="text/javascript">
+    document.getElementById('add-cart').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('product_id', this.value);
+        formData.append('csrfmiddlewaretoken', document.querySelector('input[name=csrfmiddlewaretoken]').value);
+        formData.append('action', 'post');
+
+        fetch('{% url "cart:cart_add" %}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(json => console.log(json))
+        .catch(error => console.error(error));
+    });
+</script>
+
+<!-- with jQuery -->
+<!-- 
+<script type="text/javascript">
+    $(document).on('click', '#add-cart', function(e){
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "cart:cart_add" %}',
+            data: {
+                product_id: $(this).val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                action: 'post'
+            },
+            success: function(json) {
+                console.log(json);
+            },
+            error: function(xhr, errmsg, err){
+                console.error(errmsg);
+            }
+        });
+    });
+</script>
+-->
 {% endblock content %}

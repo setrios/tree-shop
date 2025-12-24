@@ -4,6 +4,6 @@ from . import views
 app_name = 'products'
 
 urlpatterns = [
-    path('', views.TreeListView.as_view(), name='tree-list'),
-    path('trees/<int:pk>/', views.TreeDetailView.as_view(), name='tree-detail')
+    path('', views.TreeListView.as_view(), name='tree_list'),
+    path('trees/<int:pk>/', views.TreeDetailView.as_view(), name='tree_detail')
 ]
