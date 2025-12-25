@@ -1,11 +1,19 @@
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+
+from orders.models import ShippingAddress
 
 # Create your views here.
 
+@login_required
 def home(request):
-    return render(request, 'users/home.html')
+    addresses = request.user.addresses.all()
+    context = {
+        'addresses': addresses
+    }
+    return render(request, 'users/home.html', context)
 
 
 # need to define sign_up view as it is not in 'django.contrib.auth.urls'

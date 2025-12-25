@@ -2,6 +2,12 @@
 
 {% block content %}
 <main>
-    <h1>User Home Page</h1>
+    <h1>Welcome {{ request.user.username }}!</h1>
+    <hr>
+    <h2>Your shipping addresses</h2>
+    {% for address in addresses %}
+        <p>{{ address.city }}</p>
+    {% endfor %}
+    <a href="{% url "orders:add_address" %}">Add Address</a>
 </main>
 {% endblock content %}
