@@ -9,7 +9,7 @@
     {% for tree in object_list %}
         <a href="{% url "products:tree_detail" tree.id %}">
             <div class="card">
-                <img src="{{ tree.image.url }}" alt="{{ tree.name }}">
+                <img src="{{ tree.image.url }}" alt="{{ tree.name }}" style="width: 20rem;">
                 <h4>{{ tree.name }}</h4>
                 <p>{{ tree.tree_type }}</p>
                 <p>{{ tree.color }}</p>
@@ -20,4 +20,5 @@
     {% endfor %}
     </div>
 </main>
+
 {% endblock content %}

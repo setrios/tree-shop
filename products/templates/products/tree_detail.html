@@ -3,7 +3,7 @@
 {% block content %}
 <main>
     <div>
-        <img src="{{ tree.image.url }}" alt="{{ tree.name }}">
+        <img src="{{ tree.image.url }}" alt="{{ tree.name }}" style="width: 20rem;">
         <h2>{{ tree.name }}</h2>
         <p>Tree type: {{ tree.tree_type }}</p>
         <p>Color: {{ tree.color }}</p>
@@ -27,6 +27,19 @@
 
 <!-- sending AJAX  with vanilla JS -->
 <script type="text/javascript">
+    function updateHeaderCartCount(cartHeaderId, quantity)
+    {
+        const cartHeader = document.getElementById(cartHeaderId);
+
+        if (!cartHeader) {
+            console.error('Cart element not found by id: ', cartHeaderId);
+            return;
+        }
+
+        cartHeader.textContent = `Cart (${quantity})`
+
+    }
+
     document.getElementById('add-cart').addEventListener('click', function(e) {
         e.preventDefault();
 
@@ -40,7 +53,14 @@
             body: formData
         })
         .then(response => response.json())
-        .then(json => console.log(json))
+        .then(json => {
+            if (json.success) {
+                updateHeaderCartCount('cart-header', json.cart_count);
+            } 
+            else {
+                console.error('Error adding to cart:', json.error);
+            }
+        })
         .catch(error => console.error(error));
     });
 </script>

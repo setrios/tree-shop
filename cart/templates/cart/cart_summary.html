@@ -1,5 +1,239 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% csrf_token %}
 
+<main>
+    <h2>Your Cart ({{ cart_count }} items)</h2>
+    <h3>Total: $<span id="cart-total">{{ cart_total }}</span></h3>
+    
+    {% for cart_item in cart_items %}
+        <div class="card" data-product-id="{{ cart_item.product.id }}">
+            <a href="{% url "products:tree_detail" cart_item.product.id %}">
+                <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}" style="width: 20rem;">
+                <h4>{{ cart_item.product.name }}</h4>
+                <p>{{ cart_item.product.tree_type }}</p>
+                <p>{{ cart_item.product.color }}</p>
+                <p>Price: ${{ cart_item.product.price }}</p>
+            </a>
+            
+            <!-- Moved buttons outside the <a> tag -->
+            <div class="cart-controls">
+                <p>
+                    <button class="decrease-cart" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">-</button>
+                    <span class="quantity-display">{{ cart_item.quantity }}</span>
+                    <button class="increase-cart" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">+</button>
+                    <span class="stock-info">({{ cart_item.product.quantity }} available)</span>
+                </p>
+                
+                <button class="remove-cart" data-product-id="{{ cart_item.product.id }}">Delete</button>
+                <h5>Item Total: $<span class="item-total">{{ cart_item.total_price }}</span></h5>
+            </div>
+        </div>
+    {% empty %}
+        <p>Your cart is empty</p>
+    {% endfor %}
+</main>
+
+<script type="text/javascript">
+    // Get CSRF token from cookie (Django's default method)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    const csrftoken = getCookie('csrftoken');
+
+    // Helper function to send cart updates
+    function updateCart(url, productId, quantity = null) {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('csrfmiddlewaretoken', csrftoken);
+        formData.append('action', 'post');
+        
+        if (quantity !== null) {
+            formData.append('quantity', quantity);
+        }
+
+        return fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Request failed');
+                });
+            }
+            return response.json();
+        });
+    }
+
+    // Helper function to update UI
+    function updateCartUI(productId, data) {
+        const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+        
+        if (!card) {
+            console.error('Card not found for product:', productId);
+            return;
+        }
+        
+        if (data.quantity !== undefined) {
+            const qtyDisplay = card.querySelector('.quantity-display');
+            const itemTotal = card.querySelector('.item-total');
+            
+            if (qtyDisplay) qtyDisplay.textContent = data.quantity;
+            if (itemTotal) itemTotal.textContent = data.item_total.toFixed(2);
+        }
+        
+        if (data.cart_total !== undefined) {
+            const cartTotal = document.getElementById('cart-total');
+            if (cartTotal) cartTotal.textContent = data.cart_total.toFixed(2);
+        }
+    }
+
+    // Increase quantity
+    document.querySelectorAll('.increase-cart').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = this.dataset.productId;
+            const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            
+            if (!card) {
+                console.error('Card not found');
+                return;
+            }
+            
+            const qtyDisplay = card.querySelector('.quantity-display');
+            const currentQty = parseInt(qtyDisplay.textContent);
+            const maxStock = parseInt(this.dataset.maxStock);
+            
+            if (currentQty >= maxStock) {
+                alert('Not enough stock available');
+                return;
+            }
+            
+            const newQty = currentQty + 1;
+            
+            updateCart('{% url "cart:cart_update" %}', productId, newQty)
+                .then(data => {
+                    if (data.success) {
+                        updateCartUI(productId, data);
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update cart: ' + error.message);
+                });
+        });
+    });
+
+    // Decrease quantity
+    document.querySelectorAll('.decrease-cart').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = this.dataset.productId;
+            const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            
+            if (!card) {
+                console.error('Card not found');
+                return;
+            }
+            
+            const qtyDisplay = card.querySelector('.quantity-display');
+            const currentQty = parseInt(qtyDisplay.textContent);
+            const newQty = currentQty - 1;
+            
+            if (newQty <= 0) {
+                if (confirm('Remove this item from cart?')) {
+                    updateCart('{% url "cart:cart_delete" %}', productId)
+                        .then(data => {
+                            if (data.success) {
+                                card.remove();
+                                const cartTotal = document.getElementById('cart-total');
+                                if (cartTotal) cartTotal.textContent = data.cart_total.toFixed(2);
+                                
+                                // Check if cart is empty
+                                if (data.cart_count === 0) {
+                                    location.reload();
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Failed to remove item: ' + error.message);
+                        });
+                }
+                return;
+            }
+            
+            updateCart('{% url "cart:cart_update" %}', productId, newQty)
+                .then(data => {
+                    if (data.success) {
+                        updateCartUI(productId, data);
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update cart: ' + error.message);
+                });
+        });
+    });
+
+    // Remove from cart
+    document.querySelectorAll('.remove-cart').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = this.dataset.productId;
+            const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            
+            if (!card) {
+                console.error('Card not found');
+                return;
+            }
+            
+            if (confirm('Remove this item from cart?')) {
+                updateCart('{% url "cart:cart_delete" %}', productId)
+                    .then(data => {
+                        if (data.success) {
+                            card.remove();
+                            const cartTotal = document.getElementById('cart-total');
+                            if (cartTotal) cartTotal.textContent = data.cart_total.toFixed(2);
+                            
+                            if (data.cart_count === 0) {
+                                location.reload();
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to remove item: ' + error.message);
+                    });
+            }
+        });
+    });
+</script>
 {% endblock content %}
