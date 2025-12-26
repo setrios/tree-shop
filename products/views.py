@@ -19,7 +19,7 @@ class TreeListView(ListView):
                 queryset = queryset.filter(color__in=data['colors'])
 
             if data['decorations']:
-                queryset = queryset.filter(decoration__in=data['decorations'])
+                queryset = queryset.filter(decorations__in=data['decorations'])
 
             if data['tree_types']:
                 queryset = queryset.filter(tree_type__in=data['tree_types'])
