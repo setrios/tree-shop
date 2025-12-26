@@ -69,25 +69,32 @@ class Cart():
     def get_cart_items(self):
         product_ids = self.cart.keys()
         products = Tree.objects.filter(id__in=product_ids)
-        
+
         cart_items = []
         for product in products:
             item = self.cart[str(product.id)]
+            price = Decimal(item['price'])
+            quantity = item['quantity']
+            
             cart_items.append({
                 'product': product,
-                'quantity': item['quantity'],
-                'price': float(item['price']),
-                'total_price': float(item['price']) * item['quantity'],
+                'quantity': quantity,
+                'price': price,
+                'total_price': (price * quantity).quantize(Decimal('0.01')),
             })
-        
+
         return cart_items
 
 
     def get_total_price(self):
-        total = sum(
-            Decimal(item['price']) * item['quantity']
-            for item in self.cart.values()
-        )
+        if self.cart:
+            total = sum(
+                Decimal(item['price']) * item['quantity']
+                for item in self.cart.values()
+            )
+        else:
+            total = Decimal('0')
+
         return total.quantize(Decimal('0.00'))
 
 

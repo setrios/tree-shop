@@ -4,7 +4,7 @@
 {% csrf_token %}
 
 <main>
-    <h2>Your Cart ({{ cart_count }} items)</h2>
+    <h2>Your Cart</h2>
     <h3>Total: $<span id="cart-total">{{ cart_total }}</span></h3>
     
     {% for cart_item in cart_items %}
@@ -104,13 +104,26 @@
             const itemTotal = card.querySelector('.item-total');
             
             if (qtyDisplay) qtyDisplay.textContent = data.quantity;
-            if (itemTotal) itemTotal.textContent = data.item_total.toFixed(2);
+            if (itemTotal) itemTotal.textContent = parseFloat(data.item_total).toFixed(2);
         }
         
         if (data.cart_total !== undefined) {
             const cartTotal = document.getElementById('cart-total');
-            if (cartTotal) cartTotal.textContent = data.cart_total.toFixed(2);
+            if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
         }
+    }
+
+    function updateHeaderCartCount(cartHeaderId, quantity)
+    {
+        const cartHeader = document.getElementById(cartHeaderId);
+
+        if (!cartHeader) {
+            console.error('Cart element not found by id: ', cartHeaderId);
+            return;
+        }
+
+        cartHeader.textContent = `Cart (${quantity})`
+
     }
 
     // Increase quantity
@@ -142,7 +155,9 @@
                 .then(data => {
                     if (data.success) {
                         updateCartUI(productId, data);
-                    } else {
+                        updateHeaderCartCount('cart-header', data.cart_count);
+                    } 
+                    else {
                         alert(data.error);
                     }
                 })
@@ -178,7 +193,7 @@
                             if (data.success) {
                                 card.remove();
                                 const cartTotal = document.getElementById('cart-total');
-                                if (cartTotal) cartTotal.textContent = data.cart_total.toFixed(2);
+                                if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
                                 
                                 // Check if cart is empty
                                 if (data.cart_count === 0) {
@@ -198,7 +213,9 @@
                 .then(data => {
                     if (data.success) {
                         updateCartUI(productId, data);
-                    } else {
+                        updateHeaderCartCount('cart-header', data.cart_count);
+                    } 
+                    else {
                         alert(data.error);
                     }
                 })
@@ -229,7 +246,7 @@
                         if (data.success) {
                             card.remove();
                             const cartTotal = document.getElementById('cart-total');
-                            if (cartTotal) cartTotal.textContent = data.cart_total.toFixed(2);
+                            if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
                             
                             if (data.cart_count === 0) {
                                 location.reload();

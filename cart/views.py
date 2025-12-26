@@ -13,7 +13,7 @@ def cart_summary(request):
     
     context = {
         'cart_items': cart_items,
-        # 'cart_total': cart.get_total_price(),
+        'cart_total': cart.get_total_price(),
         'cart_count': len(cart),
     }
     return render(request, 'cart/cart_summary.html', context)
