@@ -30,11 +30,17 @@
                 <h5>Item Total: $<span class="item-total">{{ cart_item.total_price }}</span></h5>
             </div>
         </div>
+
     {% empty %}
         <p>Your cart is empty</p>
     {% endfor %}
 
-    <button>Submit order</button>
+    {% if cart_items %}
+        <form action="{% url "orders:place_order" %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Submit order</button>
+        </form>
+    {% endif %}
 </main>
 
 <script type="text/javascript">

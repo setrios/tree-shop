@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Place Your Order</h2>
+
+<form action="" method="post" id="orderForm">
+    {% csrf_token %}
+    
+    {% if is_authenticated %}
+    <div class="form-group">
+        <label for="{{ form.existing_address.id_for_label }}">Select Existing Address:</label>
+        {{ form.existing_address }}
+        {% if form.existing_address.errors %}
+            <div class="errors">{{ form.existing_address.errors }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <h3>Shipping Address</h3>
+    
+    <div class="form-group">
+        <label for="{{ form.first_name.id_for_label }}">First Name: *</label>
+        {{ form.first_name }}
+        {% if form.first_name.errors %}
+            <div class="errors">{{ form.first_name.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.last_name.id_for_label }}">Last Name: *</label>
+        {{ form.last_name }}
+        {% if form.last_name.errors %}
+            <div class="errors">{{ form.last_name.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.address1.id_for_label }}">Address Line 1: *</label>
+        {{ form.address1 }}
+        {% if form.address1.errors %}
+            <div class="errors">{{ form.address1.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.address2.id_for_label }}">Address Line 2:</label>
+        {{ form.address2 }}
+        {% if form.address2.errors %}
+            <div class="errors">{{ form.address2.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.city.id_for_label }}">City: *</label>
+        {{ form.city }}
+        {% if form.city.errors %}
+            <div class="errors">{{ form.city.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.state.id_for_label }}">State: *</label>
+        {{ form.state }}
+        {% if form.state.errors %}
+            <div class="errors">{{ form.state.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.postal_code.id_for_label }}">Postal Code: *</label>
+        {{ form.postal_code }}
+        {% if form.postal_code.errors %}
+            <div class="errors">{{ form.postal_code.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.country.id_for_label }}">Country: *</label>
+        {{ form.country }}
+        {% if form.country.errors %}
+            <div class="errors">{{ form.country.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.phone.id_for_label }}">Phone: *</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}
+            <div class="errors">{{ form.phone.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="{{ form.special_instructions.id_for_label }}">Special Instructions:</label>
+        {{ form.special_instructions }}
+        {% if form.special_instructions.errors %}
+            <div class="errors">{{ form.special_instructions.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <h3>Payment</h3>
+    
+    <div class="form-group">
+        <label for="{{ form.payment_provider.id_for_label }}">Payment Provider:</label>
+        {{ form.payment_provider }}
+        {% if form.payment_provider.errors %}
+            <div class="errors">{{ form.payment_provider.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <input type="submit" value="Place Order">
+</form>
+
+{% if is_authenticated %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const existingAddressSelect = document.getElementById('id_existing_address');
+    const addressFields = [
+        'id_first_name', 'id_last_name', 'id_address1', 'id_address2',
+        'id_city', 'id_state', 'id_postal_code', 'id_country', 
+        'id_phone', 'id_special_instructions'
+    ];
+    
+    // Store address data in the select options
+    const addressData = {};
+    
+    {% for address in form.existing_address.field.queryset %}
+    addressData[{{ address.id }}] = {
+        first_name: "{{ address.first_name|escapejs }}",
+        last_name: "{{ address.last_name|escapejs }}",
+        address1: "{{ address.address1|escapejs }}",
+        address2: "{{ address.address2|escapejs }}",
+        city: "{{ address.city|escapejs }}",
+        state: "{{ address.state|escapejs }}",
+        postal_code: "{{ address.postal_code|escapejs }}",
+        country: "{{ address.country|escapejs }}",
+        phone: "{{ address.phone|escapejs }}",
+        special_instructions: "{{ address.special_instructions|escapejs }}"
+    };
+    {% endfor %}
+    
+    existingAddressSelect.addEventListener('change', function() {
+        const selectedId = this.value;
+        
+        if (selectedId && addressData[selectedId]) {
+            // Populate fields with selected address
+            const address = addressData[selectedId];
+            document.getElementById('id_first_name').value = address.first_name;
+            document.getElementById('id_last_name').value = address.last_name;
+            document.getElementById('id_address1').value = address.address1;
+            document.getElementById('id_address2').value = address.address2;
+            document.getElementById('id_city').value = address.city;
+            document.getElementById('id_state').value = address.state;
+            document.getElementById('id_postal_code').value = address.postal_code;
+            document.getElementById('id_country').value = address.country;
+            document.getElementById('id_phone').value = address.phone;
+            document.getElementById('id_special_instructions').value = address.special_instructions;
+        } else {
+            // Clear fields for new address
+            addressFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.value = '';
+                }
+            });
+        }
+    });
+});
+</script>
+{% endif %}
+
+{% endblock content %}

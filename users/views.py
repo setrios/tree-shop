@@ -3,15 +3,17 @@ from .forms import RegisterForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 
-from orders.models import ShippingAddress
+from orders.models import ShippingAddress, Order
 
 # Create your views here.
 
 @login_required
 def home(request):
     addresses = request.user.addresses.all()
+    orders = request.user.orders.all()
     context = {
-        'addresses': addresses
+        'addresses': addresses,
+        'orders': orders
     }
     return render(request, 'users/home.html', context)
 

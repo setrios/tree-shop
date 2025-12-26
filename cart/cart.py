@@ -1,4 +1,6 @@
 from products.models import Tree
+from decimal import Decimal, ROUND_HALF_UP
+
 
 class Cart():
     def __init__(self, request):
@@ -58,6 +60,12 @@ class Cart():
         self.session.modified = True
 
 
+    def clear(self):
+        self.session['session_key'] = {}
+        self.cart = self.session['session_key']
+        self.session.modified = True
+
+
     def get_cart_items(self):
         product_ids = self.cart.keys()
         products = Tree.objects.filter(id__in=product_ids)
@@ -76,8 +84,11 @@ class Cart():
 
 
     def get_total_price(self):
-        return sum(float(item['price']) * item['quantity'] 
-                for item in self.cart.values())
+        total = sum(
+            Decimal(item['price']) * item['quantity']
+            for item in self.cart.values()
+        )
+        return total.quantize(Decimal('0.00'))
 
 
     def __len__(self):

@@ -3,11 +3,29 @@
 {% block content %}
 <main>
     <h1>Welcome {{ request.user.username }}!</h1>
+
     <hr>
+
     <h2>Your shipping addresses</h2>
     {% for address in addresses %}
-        <p>{{ address.city }}</p>
+        <p>
+            {{ address.city }} 
+            <form method="post" action="{% url "orders:delete_address" address.id %}">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
+            <a href="{% url "orders:update_address" address.id %}">Update</a>
+        </p>
     {% endfor %}
     <a href="{% url "orders:add_address" %}">Add Address</a>
+
+    <hr>
+
+    <h2>Your Orders</h2>
+    {% for order in orders %}
+        <p>
+            {{ order }}
+        </p>
+    {% endfor %}
 </main>
 {% endblock content %}
