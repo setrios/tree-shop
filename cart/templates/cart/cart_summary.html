@@ -3,54 +3,57 @@
 {% block content %}
 {% csrf_token %}
 
-<main class="bg-white p-6 md:p-8 border border-gray-200">
-    <div class="flex justify-between items-end border-b-2 border-black pb-4 mb-8">
-        <h2 class="text-3xl font-bold uppercase tracking-tight">Your Cart</h2>
-        <h3 class="text-xl">Total: <span class="font-bold text-secondary">$<span id="cart-total">{{ cart_total }}</span></span></h3>
+<main class="bg-white p-6 md:p-8 border border-dark max-w-4xl mx-auto">
+    <div class="flex justify-between items-end border-b-2 border-dark pb-4 mb-8">
+        <h2 class="text-3xl font-bold uppercase tracking-tighter">Your Cart</h2>
+        <h3 class="text-xl font-medium">Total: <span class="font-bold text-secondary">$<span id="cart-total">{{ cart_total }}</span></span></h3>
     </div>
     
-    <div class="space-y-6">
+    <div id="cart-items-container" class="space-y-4">
         {% for cart_item in cart_items %}
-            <div class="card flex flex-col md:flex-row gap-6 items-center bg-gray-50 p-4 border border-gray-100" data-product-id="{{ cart_item.product.id }}">
+            <div class="card flex flex-col md:flex-row gap-6 items-center bg-white p-4 border border-gray-200" data-product-id="{{ cart_item.product.id }}">
                 
                 <a href="{% url 'products:tree_detail' cart_item.product.id %}" class="flex items-center gap-6 flex-grow w-full md:w-auto">
-                    <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}" class="w-24 h-24 object-cover border border-gray-200">
+                    <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}" class="w-20 h-20 object-cover border border-dark grayscale hover:grayscale-0 transition-all">
                     <div>
-                        <h4 class="text-lg font-bold">{{ cart_item.product.name }}</h4>
-                        <p class="text-sm text-gray-500">{{ cart_item.product.tree_type }} / {{ cart_item.product.color }}</p>
-                        <p class="text-sm font-medium mt-1">${{ cart_item.product.price }}</p>
+                        <h4 class="text-lg font-bold leading-none">{{ cart_item.product.name }}</h4>
+                        <p class="text-[10px] uppercase font-bold text-gray-400 mt-1">{{ cart_item.product.tree_type }} • {{ cart_item.product.color }}</p>
+                        <p class="text-sm font-bold mt-1">${{ cart_item.product.price }}</p>
                     </div>
                 </a>
                 
-                <div class="cart-controls flex flex-col md:flex-row items-center gap-6 w-full md:w-auto justify-between">
-                    <div class="flex items-center border border-dark bg-white">
-                        <button class="decrease-cart px-3 py-1 hover:bg-gray-100 font-bold" data-product-id="{{ cart_item.product.id }}">-</button>
-                        <span class="quantity-display px-3 font-mono">{{ cart_item.quantity }}</span>
-                        <button class="increase-cart px-3 py-1 hover:bg-gray-100 font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">+</button>
+                <div class="cart-controls flex items-center gap-8 w-full md:w-auto justify-between md:justify-end">
+                    <div class="flex items-center border border-dark">
+                        <button class="decrease-cart px-3 py-1 hover:bg-primary transition-colors font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">-</button>
+                        
+                        <span class="quantity-display px-4 font-mono text-sm border-x border-dark">{{ cart_item.quantity }}</span>
+                        
+                        <button class="increase-cart px-3 py-1 hover:bg-primary transition-colors font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">+</button>
                     </div>
                     
-                    <div class="text-right min-w-[100px]">
-                        <h5 class="font-bold text-lg">$<span class="item-total">{{ cart_item.total_price }}</span></h5>
+                    <div class="text-right min-w-[80px]">
+                        <span class="font-bold text-secondary">$<span class="item-total">{{ cart_item.total_price }}</span></span>
                     </div>
 
-                    <button class="remove-cart text-red-500 text-sm font-bold hover:text-red-700 uppercase tracking-wider border-b border-transparent hover:border-red-700" data-product-id="{{ cart_item.product.id }}">
-                        Remove
+                    <button class="remove-cart text-[10px] font-bold uppercase tracking-widest text-red-600 hover:bg-red-600 hover:text-white px-2 py-1 border border-red-600 transition-all" data-product-id="{{ cart_item.product.id }}">
+                        Delete
                     </button>
                 </div>
             </div>
         {% empty %}
-            <div class="text-center py-12 bg-gray-50">
-                <p class="text-xl text-gray-400">Your cart is empty</p>
+            <div class="text-center py-20 border border-dashed border-gray-300">
+                <p class="text-gray-400 uppercase tracking-widest">Your cart is empty</p>
+                <a href="{% url 'products:tree_list' %}" class="inline-block mt-4 text-sm font-bold border-b border-dark hover:text-primary">Return to Catalog</a>
             </div>
         {% endfor %}
     </div>
 
     {% if cart_items %}
-        <div class="mt-8 flex justify-end">
-            <form action="{% url 'orders:place_order' %}" method="post" class="w-full md:w-auto">
+        <div class="mt-12 flex justify-end">
+            <form action="{% url 'orders:place_order' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="w-full md:w-auto bg-primary text-dark font-bold px-12 py-4 text-lg hover:bg-secondary hover:text-white transition-colors duration-200 uppercase tracking-widest">
-                    Checkout
+                <button type="submit" class="bg-dark text-white font-bold px-16 py-4 hover:bg-primary hover:text-dark transition-all uppercase tracking-[0.2em] text-sm">
+                    Submit order
                 </button>
             </form>
         </div>
@@ -58,10 +61,6 @@
 </main>
 
 <script type="text/javascript">
-    // (Keep your existing JS logic exactly as is, it's functional)
-    // ... [Insert the JS from your original file here] ...
-    // Just ensure to keep the getCookie and updateCart functions
-    
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -76,30 +75,95 @@
         }
         return cookieValue;
     }
-    const csrftoken = getCookie('csrftoken');
     
-    // ... [Rest of your JS] ...
-    // Just copying the key functionality for brevity in this response:
+    const csrftoken = getCookie('csrftoken');
+
     function updateCart(url, productId, quantity = null) {
         const formData = new FormData();
         formData.append('product_id', productId);
         formData.append('csrfmiddlewaretoken', csrftoken);
         formData.append('action', 'post');
         if (quantity !== null) formData.append('quantity', quantity);
-        return fetch(url, { method: 'POST', body: formData, headers: {'X-Requested-With': 'XMLHttpRequest'} })
-            .then(res => res.ok ? res.json() : res.json().then(e => { throw new Error(e.error) }));
+
+        return fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) return response.json().then(data => { throw new Error(data.error || 'Request failed'); });
+            return response.json();
+        });
     }
 
     function updateCartUI(productId, data) {
         const card = document.querySelector(`.card[data-product-id="${productId}"]`);
-        if (card && data.quantity !== undefined) {
-            card.querySelector('.quantity-display').textContent = data.quantity;
-            card.querySelector('.item-total').textContent = parseFloat(data.item_total).toFixed(2);
+        if (!card) return;
+        if (data.quantity !== undefined) {
+            const qtyDisplay = card.querySelector('.quantity-display');
+            const itemTotal = card.querySelector('.item-total');
+            if (qtyDisplay) qtyDisplay.textContent = data.quantity;
+            if (itemTotal) itemTotal.textContent = parseFloat(data.item_total).toFixed(2);
         }
-        if (data.cart_total !== undefined) document.getElementById('cart-total').textContent = parseFloat(data.cart_total).toFixed(2);
+        if (data.cart_total !== undefined) {
+            const cartTotal = document.getElementById('cart-total');
+            if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
+        }
     }
-    
-    // Wire up buttons (Increase/Decrease/Remove) exactly as in your original script
-    // I am omitting the full repeated JS block to save space, but you must keep it.
+
+    function updateHeaderCartCount(cartHeaderId, quantity) {
+        const cartHeader = document.getElementById(cartHeaderId);
+        if (cartHeader) cartHeader.textContent = `Cart (${quantity})`;
+    }
+
+    document.querySelectorAll('.increase-cart').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            const qtyDisplay = card.querySelector('.quantity-display');
+            const currentQty = parseInt(qtyDisplay.textContent);
+            const maxStock = parseInt(this.dataset.maxStock);
+            if (currentQty >= maxStock) { alert('Not enough stock available'); return; }
+            const newQty = currentQty + 1;
+            updateCart('{% url "cart:cart_update" %}', productId, newQty)
+                .then(data => { if (data.success) { updateCartUI(productId, data); updateHeaderCartCount('cart-header', data.cart_count); } else { alert(data.error); } });
+        });
+    });
+
+    document.querySelectorAll('.decrease-cart').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            const qtyDisplay = card.querySelector('.quantity-display');
+            const currentQty = parseInt(qtyDisplay.textContent);
+            const newQty = currentQty - 1;
+            if (newQty <= 0) {
+                if (confirm('Remove this item from cart?')) {
+                    updateCart('{% url "cart:cart_delete" %}', productId).then(data => {
+                        if (data.success) { card.remove(); document.getElementById('cart-total').textContent = parseFloat(data.cart_total).toFixed(2); if (data.cart_count === 0) location.reload(); }
+                    });
+                }
+                return;
+            }
+            updateCart('{% url "cart:cart_update" %}', productId, newQty).then(data => {
+                if (data.success) { updateCartUI(productId, data); updateHeaderCartCount('cart-header', data.cart_count); } else { alert(data.error); }
+            });
+        });
+    });
+
+    document.querySelectorAll('.remove-cart').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            if (confirm('Remove this item from cart?')) {
+                updateCart('{% url "cart:cart_delete" %}', productId).then(data => {
+                    if (data.success) { card.remove(); document.getElementById('cart-total').textContent = parseFloat(data.cart_total).toFixed(2); if (data.cart_count === 0) location.reload(); }
+                });
+            }
+        });
+    });
 </script>
 {% endblock content %}

@@ -5,7 +5,7 @@ from .models import ShippingAddress, Order, OrderItem
 from .forms import ShippingAddressForm, OrderForm, OrderPlacementForm
 from cart.cart import Cart
 
-@login_required
+@login_required  # automatically redirects to login page as used 'django.contrib.auth.urls'
 def add_address(request):
     if request.method == 'POST':
         form = ShippingAddressForm(request.POST)
