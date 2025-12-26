@@ -1,8 +1,11 @@
-<aside>
-    <form method="get">
-        <h2>Filters</h2>
-        <hr>
+<form method="get" class="space-y-6">
+    <h2 class="text-xl font-bold border-b-2 border-primary pb-2 mb-4">Filters</h2>
+    
+    <div class="space-y-4 [&_p]:block [&_label]:block [&_label]:text-xs [&_label]:uppercase [&_label]:font-bold [&_label]:mb-1 [&_label]:text-gray-500 [&_input]:w-full [&_input]:bg-white [&_input]:border [&_input]:border-gray-300 [&_input]:p-2 [&_input]:text-sm [&_input]:focus:border-primary [&_input]:focus:outline-none [&_select]:w-full [&_select]:border [&_select]:border-gray-300 [&_select]:p-2">
         {{ filter_form.as_p }}
-        <button type="submit">Apply filters</button>
-    </form>
-</aside>
+    </div>
+
+    <button type="submit" class="w-full mt-6 bg-dark text-white font-bold py-3 hover:bg-primary hover:text-dark transition-colors duration-200 uppercase tracking-wider text-sm">
+        Apply Filters
+    </button>
+</form>

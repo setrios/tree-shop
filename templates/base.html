@@ -4,11 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#08CB00',   // Bright Green
+                        secondary: '#253900', // Dark Green
+                        dark: '#000000',      // Black
+                        light: '#EEEEEE',     // Light Gray BG
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Strict Reset for details */
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
+<body class="bg-light text-dark flex flex-col min-h-screen antialiased selection:bg-primary selection:text-white">
+    
     {% include "includes/header.html" %}
-    {% block content %}
-    {% endblock content %}
+
+    <div class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
     {% include "includes/footer.html" %}
 </body>
 </html>

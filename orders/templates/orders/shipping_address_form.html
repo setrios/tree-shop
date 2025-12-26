@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
+<div class="max-w-xl mx-auto bg-white p-8 border border-gray-200">
+    <h2 class="text-2xl font-bold mb-6 uppercase">Address Details</h2>
+    
+    <form action="" method="post">
+        {% csrf_token %}
+        
+        <div class="space-y-4 [&_p]:block [&_label]:block [&_label]:text-xs [&_label]:font-bold [&_label]:uppercase [&_label]:mb-1 [&_label]:text-gray-500 [&_input]:w-full [&_input]:p-2 [&_input]:border [&_input]:border-gray-300 [&_input]:rounded-none [&_input]:focus:border-primary">
+            {{ form.as_p }}
+        </div>
+
+        <input type="submit" value="Save Address" class="w-full mt-8 bg-dark text-white font-bold py-3 hover:bg-primary hover:text-dark transition-colors cursor-pointer uppercase tracking-wider">
+    </form>
+</div>
 {% endblock content %}

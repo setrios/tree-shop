@@ -1,31 +1,51 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main>
-    <h1>Welcome {{ request.user.username }}!</h1>
+<main class="space-y-12">
+    <div class="border-b-2 border-primary pb-4">
+        <h1 class="text-4xl font-bold tracking-tight">Welcome, {{ request.user.username }}</h1>
+    </div>
 
-    <hr>
+    <section>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Shipping Addresses</h2>
+            <a href="{% url 'orders:add_address' %}" class="bg-dark text-white text-sm font-bold px-4 py-2 hover:bg-primary hover:text-dark transition-colors">
+                + Add New
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for address in addresses %}
+                <div class="bg-white p-6 border border-gray-200 hover:border-primary transition-colors">
+                    <p class="font-bold text-lg mb-2">{{ address.city }}</p>
+                    <p class="text-gray-500 text-sm mb-4">{{ address.address1 }}</p>
+                    
+                    <div class="flex items-center gap-4 text-sm font-bold">
+                        <a href="{% url 'orders:update_address' address.id %}" class="text-secondary hover:underline">Update</a>
+                        
+                        <form method="post" action="{% url 'orders:delete_address' address.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-500 hover:text-red-700">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-gray-400 italic">No addresses saved yet.</p>
+            {% endfor %}
+        </div>
+    </section>
 
-    <h2>Your shipping addresses</h2>
-    {% for address in addresses %}
-        <p>
-            {{ address.city }} 
-            <form method="post" action="{% url "orders:delete_address" address.id %}">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
-            <a href="{% url "orders:update_address" address.id %}">Update</a>
-        </p>
-    {% endfor %}
-    <a href="{% url "orders:add_address" %}">Add Address</a>
-
-    <hr>
-
-    <h2>Your Orders</h2>
-    {% for order in orders %}
-        <p>
-            {{ order }}
-        </p>
-    {% endfor %}
+    <section>
+        <h2 class="text-2xl font-bold mb-6">Order History</h2>
+        <div class="bg-white border border-gray-200">
+            {% for order in orders %}
+                <div class="p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <p class="font-mono text-sm">{{ order }}</p>
+                </div>
+            {% empty %}
+                <div class="p-8 text-center text-gray-400">No orders yet.</div>
+            {% endfor %}
+        </div>
+    </section>
 </main>
 {% endblock content %}

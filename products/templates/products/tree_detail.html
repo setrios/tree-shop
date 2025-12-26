@@ -1,48 +1,70 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main>
-    <div>
-        <img src="{{ tree.image.url }}" alt="{{ tree.name }}" style="width: 20rem;">
-        <h2>{{ tree.name }}</h2>
-        <p>Tree type: {{ tree.tree_type }}</p>
-        <p>Color: {{ tree.color }}</p>
-        <p>
-            Decorations: 
-            {% for deco in tree.decorations.all %}
-                {{ deco.name }}
-                {% if not forloop.last %}, {% endif %}
-            {% empty %}
-                No decorations
-            {% endfor %}
-        </p>
-        <p>Height: {{ tree.height }}</p>
-        <p>{% if tree.artificial %}Artificial{% else %}Real{% endif %}</p>
-        <h3>Price: {{ tree.price }}</h3>
-        <button value="{{ tree.id }}" id="add-cart">Add To Cart</button>
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> <!-- for correct AJAX send -->
-        <p>{{ tree.description }}</p>
+<main class="bg-white border border-gray-200 p-6 md:p-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        
+        <div class="relative bg-gray-100 aspect-square">
+            <img src="{{ tree.image.url }}" alt="{{ tree.name }}" class="w-full h-full object-contain mix-blend-multiply p-8">
+        </div>
+
+        <div class="flex flex-col justify-center space-y-6">
+            <div>
+                <h1 class="text-4xl font-bold text-dark tracking-tight mb-2">{{ tree.name }}</h1>
+                <p class="text-2xl font-medium text-secondary">${{ tree.price }}</p>
+            </div>
+
+            <div class="space-y-2 text-sm border-t border-b border-gray-100 py-6">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Type</span>
+                    <span class="font-medium">{% if tree.artificial %}Artificial{% else %}Real{% endif %} {{ tree.tree_type }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Height</span>
+                    <span class="font-medium">{{ tree.height }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Color</span>
+                    <span class="font-medium">{{ tree.color }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Decorations</span>
+                    <span class="font-medium text-right w-1/2">
+                        {% for deco in tree.decorations.all %}
+                            {{ deco.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            None
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed">{{ tree.description }}</p>
+
+            <div class="pt-6">
+                <button value="{{ tree.id }}" id="add-cart" class="w-full bg-primary text-dark font-bold py-4 text-lg hover:bg-secondary hover:text-white transition-colors duration-200 uppercase tracking-widest">
+                    Add To Cart
+                </button>
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            </div>
+        </div>
     </div>
 </main>
 
-<!-- sending AJAX  with vanilla JS -->
 <script type="text/javascript">
-    function updateHeaderCartCount(cartHeaderId, quantity)
-    {
+    function updateHeaderCartCount(cartHeaderId, quantity) {
         const cartHeader = document.getElementById(cartHeaderId);
-
-        if (!cartHeader) {
-            console.error('Cart element not found by id: ', cartHeaderId);
-            return;
-        }
-
-        cartHeader.textContent = `Cart (${quantity})`
-
+        if (cartHeader) cartHeader.textContent = `Cart (${quantity})`;
     }
 
     document.getElementById('add-cart').addEventListener('click', function(e) {
         e.preventDefault();
-
+        
+        // Visual feedback on button
+        const btn = this;
+        const originalText = btn.innerText;
+        btn.innerText = "Adding...";
+        
         const formData = new FormData();
         formData.append('product_id', this.value);
         formData.append('csrfmiddlewaretoken', document.querySelector('input[name=csrfmiddlewaretoken]').value);
@@ -56,37 +78,18 @@
         .then(json => {
             if (json.success) {
                 updateHeaderCartCount('cart-header', json.cart_count);
-            } 
-            else {
+                btn.innerText = "Added!";
+                btn.classList.add('bg-secondary', 'text-white');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-secondary', 'text-white');
+                }, 2000);
+            } else {
                 console.error('Error adding to cart:', json.error);
+                btn.innerText = "Error";
             }
         })
         .catch(error => console.error(error));
     });
 </script>
-
-<!-- with jQuery -->
-<!-- 
-<script type="text/javascript">
-    $(document).on('click', '#add-cart', function(e){
-        e.preventDefault();
-
-        $.ajax({
-            type: 'POST',
-            url: '{% url "cart:cart_add" %}',
-            data: {
-                product_id: $(this).val(),
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                action: 'post'
-            },
-            success: function(json) {
-                console.log(json);
-            },
-            error: function(xhr, errmsg, err){
-                console.error(errmsg);
-            }
-        });
-    });
-</script>
--->
 {% endblock content %}
