@@ -1,64 +1,57 @@
-<form method="get" class="space-y-6">
-    <h2 class="text-xl font-bold border-b-2 border-dark pb-2 mb-4 uppercase tracking-tighter">
-        Filters
-    </h2>
-
-    <div class="space-y-2
-        [&_p]:grid [&_p]:grid-cols-[auto_1fr] [&_p]:items-center [&_p]:gap-3
-        [&_p]:py-2 [&_p]:border-b [&_p]:border-gray-100
-
-        [&_label]:text-[11px] [&_label]:font-bold [&_label]:uppercase
-        [&_label]:text-dark [&_label]:cursor-pointer
-
-        [&_input[type='checkbox']]:w-4
-        [&_input[type='checkbox']]:h-4
-        [&_input[type='checkbox']]:accent-primary
-        [&_input[type='checkbox']]:cursor-pointer
-
-        /* Text & number inputs */
-        [&_input[type='text']]:col-span-2
-        [&_input[type='number']]:col-span-2
-        [&_select]:col-span-2
-
-        [&_input[type='text']]:w-full
-        [&_input[type='number']]:w-full
-        [&_select]:w-full
-
-        [&_input[type='text']]:border
-        [&_input[type='number']]:border
-        [&_select]:border
-
-        [&_input[type='text']]:border-gray-300
-        [&_input[type='number']]:border-gray-300
-        [&_select]:border-gray-300
-
-        [&_input[type='text']]:p-2
-        [&_input[type='number']]:p-2
-        [&_select]:p-2
-
-        [&_input[type='text']]:mt-1
-        [&_input[type='number']]:mt-1
-        [&_select]:mt-1
-        [&_select]:text-sm
-    ">
-        {{ filter_form.as_p }}
-    </div>
-
-    <div class="pt-4 space-y-4">
-        <button type="submit"
-            class="w-full bg-dark text-white font-bold py-3
-                   hover:bg-primary hover:text-dark
-                   transition-all duration-200
-                   uppercase tracking-widest text-xs
-                   border border-dark">
-            Update Results
+<aside class="w-64 bg-white border-r border-gray-900 p-6 min-h-screen">
+    <form method="get">
+        <h2 class="text-xl font-bold uppercase tracking-tight mb-6 pb-4 border-b border-gray-900">
+            Filters
+        </h2>
+        
+        <div class="space-y-6">
+            {{ filter_form.as_p }}
+        </div>
+        
+        <button type="submit" class="w-full mt-8 px-6 py-3 bg-accent text-white font-medium uppercase tracking-wide hover:bg-gray-900 transition-colors">
+            Apply Filters
         </button>
+    </form>
+</aside>
 
-        <a href="?"
-           class="block text-center text-[10px]
-                  font-bold uppercase text-gray-400
-                  hover:text-red-500 transition-colors">
-            Reset All
-        </a>
-    </div>
-</form>
+<style>
+    aside form p {
+        margin-bottom: 1.5rem;
+    }
+    
+    aside form label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    aside form input[type="text"],
+    aside form input[type="number"],
+    aside form select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        background-color: #f9fafb;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    aside form input[type="text"]:focus,
+    aside form input[type="number"]:focus,
+    aside form select:focus {
+        outline: none;
+        border-color: #10b981;
+        background-color: white;
+    }
+    
+    aside form input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-right: 0.5rem;
+        accent-color: #10b981;
+    }
+</style>

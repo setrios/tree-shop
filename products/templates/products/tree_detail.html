@@ -1,75 +1,86 @@
 {% extends "base.html" %}
-
 {% block content %}
-<main class="bg-white border border-gray-200 p-6 md:p-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-        
-        <div class="relative bg-gray-100 aspect-square">
-            <img src="{{ tree.image.url }}" alt="{{ tree.name }}" class="w-full h-full object-contain mix-blend-multiply p-8">
-        </div>
-
-        <div class="flex flex-col justify-center space-y-6">
-            <div>
-                <h1 class="text-4xl font-bold text-dark tracking-tight mb-2">{{ tree.name }}</h1>
-                <p class="text-2xl font-medium text-secondary">${{ tree.price }}</p>
+<main class="container mx-auto px-6 py-16">
+    <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white border border-gray-900 p-8">
+            <!-- Product Image -->
+            <div class="border border-gray-200">
+                <img src="{{ tree.image.url }}" alt="{{ tree.name }}" class="w-full h-auto">
             </div>
-
-            <div class="space-y-2 text-sm border-t border-b border-gray-100 py-6">
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Type</span>
-                    <span class="font-medium">{% if tree.artificial %}Artificial{% else %}Real{% endif %} {{ tree.tree_type }}</span>
+            
+            <!-- Product Details -->
+            <div class="flex flex-col">
+                <h1 class="text-4xl font-bold uppercase tracking-tight mb-6">
+                    {{ tree.name }}
+                </h1>
+                
+                <div class="space-y-4 mb-8 text-sm">
+                    <div class="flex border-b border-gray-100 pb-3">
+                        <span class="font-bold uppercase tracking-wide text-gray-600 w-32">Type</span>
+                        <span class="text-gray-900">{{ tree.tree_type }}</span>
+                    </div>
+                    
+                    <div class="flex border-b border-gray-100 pb-3">
+                        <span class="font-bold uppercase tracking-wide text-gray-600 w-32">Color</span>
+                        <span class="text-gray-900">{{ tree.color }}</span>
+                    </div>
+                    
+                    <div class="flex border-b border-gray-100 pb-3">
+                        <span class="font-bold uppercase tracking-wide text-gray-600 w-32">Decorations</span>
+                        <span class="text-gray-900">
+                            {% for deco in tree.decorations.all %}
+                                {{ deco.name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                No decorations
+                            {% endfor %}
+                        </span>
+                    </div>
+                    
+                    <div class="flex border-b border-gray-100 pb-3">
+                        <span class="font-bold uppercase tracking-wide text-gray-600 w-32">Height</span>
+                        <span class="text-gray-900">{{ tree.height }}</span>
+                    </div>
+                    
+                    <div class="flex border-b border-gray-100 pb-3">
+                        <span class="font-bold uppercase tracking-wide text-gray-600 w-32">Material</span>
+                        <span class="text-gray-900">{% if tree.artificial %}Artificial{% else %}Real{% endif %}</span>
+                    </div>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Height</span>
-                    <span class="font-medium">{{ tree.height }}</span>
+                
+                <div class="mb-8">
+                    <p class="text-5xl font-bold text-gray-900 mb-6">${{ tree.price }}</p>
+                    <button value="{{ tree.id }}" id="add-cart" class="w-full px-8 py-4 bg-accent text-white font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors text-lg">
+                        Add To Cart
+                    </button>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Color</span>
-                    <span class="font-medium">{{ tree.color }}</span>
+                
+                <div class="mt-auto">
+                    <h3 class="text-sm font-bold uppercase tracking-wide text-gray-600 mb-3">Description</h3>
+                    <p class="text-gray-700 leading-relaxed">{{ tree.description }}</p>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Decorations</span>
-                    <span class="font-medium text-right w-1/2">
-                        {% for deco in tree.decorations.all %}
-                            {{ deco.name }}{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            None
-                        {% endfor %}
-                    </span>
-                </div>
-            </div>
-
-            <p class="text-gray-700 leading-relaxed">{{ tree.description }}</p>
-
-            <div class="pt-6">
-                <button value="{{ tree.id }}" id="add-cart" class="w-full bg-primary text-dark font-bold py-4 text-lg hover:bg-secondary hover:text-white transition-colors duration-200 uppercase tracking-widest">
-                    Add To Cart
-                </button>
-                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             </div>
         </div>
     </div>
 </main>
 
+<!-- sending AJAX with vanilla JS -->
 <script type="text/javascript">
-    function updateHeaderCartCount(cartHeaderId, quantity) {
+    function updateHeaderCartCount(cartHeaderId, quantity)
+    {
         const cartHeader = document.getElementById(cartHeaderId);
-        if (cartHeader) cartHeader.textContent = `Cart (${quantity})`;
+        if (!cartHeader) {
+            console.error('Cart element not found by id: ', cartHeaderId);
+            return;
+        }
+        cartHeader.textContent = `Cart (${quantity})`
     }
-
     document.getElementById('add-cart').addEventListener('click', function(e) {
         e.preventDefault();
-        
-        // Visual feedback on button
-        const btn = this;
-        const originalText = btn.innerText;
-        btn.innerText = "Adding...";
-        
         const formData = new FormData();
         formData.append('product_id', this.value);
         formData.append('csrfmiddlewaretoken', document.querySelector('input[name=csrfmiddlewaretoken]').value);
         formData.append('action', 'post');
-
         fetch('{% url "cart:cart_add" %}', {
             method: 'POST',
             body: formData
@@ -78,15 +89,9 @@
         .then(json => {
             if (json.success) {
                 updateHeaderCartCount('cart-header', json.cart_count);
-                btn.innerText = "Added!";
-                btn.classList.add('bg-secondary', 'text-white');
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.classList.remove('bg-secondary', 'text-white');
-                }, 2000);
-            } else {
+            } 
+            else {
                 console.error('Error adding to cart:', json.error);
-                btn.innerText = "Error";
             }
         })
         .catch(error => console.error(error));

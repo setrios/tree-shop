@@ -1,17 +1,76 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="max-w-xl mx-auto bg-white p-8 border border-gray-200">
-    <h2 class="text-2xl font-bold mb-6 uppercase">Address Details</h2>
-    
-    <form action="" method="post">
-        {% csrf_token %}
+<div class="container mx-auto px-6 py-16">
+    <div class="max-w-2xl mx-auto bg-white border border-gray-900 p-8">
+        <h1 class="text-3xl font-bold uppercase tracking-tight mb-8 pb-6 border-b border-gray-900">
+            Shipping Address
+        </h1>
         
-        <div class="space-y-4 [&_p]:block [&_label]:block [&_label]:text-xs [&_label]:font-bold [&_label]:uppercase [&_label]:mb-1 [&_label]:text-gray-500 [&_input]:w-full [&_input]:p-2 [&_input]:border [&_input]:border-gray-300 [&_input]:rounded-none [&_input]:focus:border-primary">
+        <form action="" method="post" class="space-y-6">
+            {% csrf_token %}
             {{ form.as_p }}
-        </div>
-
-        <input type="submit" value="Save Address" class="w-full mt-8 bg-dark text-white font-bold py-3 hover:bg-primary hover:text-dark transition-colors cursor-pointer uppercase tracking-wider">
-    </form>
+            
+            <button type="submit" class="w-full px-8 py-4 bg-accent text-white font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors">
+                Save Address
+            </button>
+        </form>
+    </div>
 </div>
+
+<style>
+    form p {
+        margin-bottom: 1.5rem;
+    }
+    
+    form label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+    }
+    
+    form input[type="text"],
+    form input[type="tel"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        background-color: #f9fafb;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    form input[type="text"]:focus,
+    form input[type="tel"]:focus,
+    form select:focus,
+    form textarea:focus {
+        outline: none;
+        border-color: #10b981;
+        background-color: white;
+    }
+    
+    form textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    form .errorlist {
+        list-style: none;
+        padding: 0;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #dc2626;
+    }
+    
+    form .helptext {
+        display: block;
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+    }
+</style>
 {% endblock content %}

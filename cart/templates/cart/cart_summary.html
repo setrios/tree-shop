@@ -1,66 +1,90 @@
 {% extends "base.html" %}
-
 {% block content %}
 {% csrf_token %}
-
-<main class="bg-white p-6 md:p-8 border border-dark max-w-4xl mx-auto">
-    <div class="flex justify-between items-end border-b-2 border-dark pb-4 mb-8">
-        <h2 class="text-3xl font-bold uppercase tracking-tighter">Your Cart</h2>
-        <h3 class="text-xl font-medium">Total: <span class="font-bold text-secondary">$<span id="cart-total">{{ cart_total }}</span></span></h3>
-    </div>
-    
-    <div id="cart-items-container" class="space-y-4">
-        {% for cart_item in cart_items %}
-            <div class="card flex flex-col md:flex-row gap-6 items-center bg-white p-4 border border-gray-200" data-product-id="{{ cart_item.product.id }}">
-                
-                <a href="{% url 'products:tree_detail' cart_item.product.id %}" class="flex items-center gap-6 flex-grow w-full md:w-auto">
-                    <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}" class="w-20 h-20 object-cover border border-dark grayscale hover:grayscale-0 transition-all">
-                    <div>
-                        <h4 class="text-lg font-bold leading-none">{{ cart_item.product.name }}</h4>
-                        <p class="text-[10px] uppercase font-bold text-gray-400 mt-1">{{ cart_item.product.tree_type }} • {{ cart_item.product.color }}</p>
-                        <p class="text-sm font-bold mt-1">${{ cart_item.product.price }}</p>
-                    </div>
-                </a>
-                
-                <div class="cart-controls flex items-center gap-8 w-full md:w-auto justify-between md:justify-end">
-                    <div class="flex items-center border border-dark">
-                        <button class="decrease-cart px-3 py-1 hover:bg-primary transition-colors font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">-</button>
-                        
-                        <span class="quantity-display px-4 font-mono text-sm border-x border-dark">{{ cart_item.quantity }}</span>
-                        
-                        <button class="increase-cart px-3 py-1 hover:bg-primary transition-colors font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">+</button>
-                    </div>
-                    
-                    <div class="text-right min-w-[80px]">
-                        <span class="font-bold text-secondary">$<span class="item-total">{{ cart_item.total_price }}</span></span>
-                    </div>
-
-                    <button class="remove-cart text-[10px] font-bold uppercase tracking-widest text-red-600 hover:bg-red-600 hover:text-white px-2 py-1 border border-red-600 transition-all" data-product-id="{{ cart_item.product.id }}">
-                        Delete
-                    </button>
-                </div>
-            </div>
-        {% empty %}
-            <div class="text-center py-20 border border-dashed border-gray-300">
-                <p class="text-gray-400 uppercase tracking-widest">Your cart is empty</p>
-                <a href="{% url 'products:tree_list' %}" class="inline-block mt-4 text-sm font-bold border-b border-dark hover:text-primary">Return to Catalog</a>
-            </div>
-        {% endfor %}
-    </div>
-
-    {% if cart_items %}
-        <div class="mt-12 flex justify-end">
-            <form action="{% url 'orders:place_order' %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="bg-dark text-white font-bold px-16 py-4 hover:bg-primary hover:text-dark transition-all uppercase tracking-[0.2em] text-sm">
-                    Submit order
-                </button>
-            </form>
+<main class="container mx-auto px-6 py-16">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-12">
+            <h1 class="text-4xl font-bold uppercase tracking-tight">Your Cart</h1>
+            <p class="text-3xl font-bold text-gray-900">
+                Total: $<span id="cart-total">{{ cart_total }}</span>
+            </p>
         </div>
-    {% endif %}
+        
+        {% if cart_items %}
+            <div class="space-y-6 mb-12">
+                {% for cart_item in cart_items %}
+                    <div class="card bg-white border border-gray-900 p-6" data-product-id="{{ cart_item.product.id }}">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <a href="{% url "products:tree_detail" cart_item.product.id %}" class="flex-shrink-0">
+                                <div class="w-48 h-48 border border-gray-200 overflow-hidden">
+                                    <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}" class="w-full h-full object-cover hover:scale-105 transition-transform">
+                                </div>
+                            </a>
+                            
+                            <div class="flex-grow">
+                                <a href="{% url "products:tree_detail" cart_item.product.id %}" class="block group">
+                                    <h3 class="text-2xl font-bold uppercase tracking-tight mb-2 group-hover:text-accent transition-colors">
+                                        {{ cart_item.product.name }}
+                                    </h3>
+                                    <div class="text-sm space-y-1 mb-4 text-gray-600">
+                                        <p class="uppercase tracking-wide">{{ cart_item.product.tree_type }}</p>
+                                        <p class="uppercase tracking-wide">{{ cart_item.product.color }}</p>
+                                    </div>
+                                    <p class="text-lg font-medium text-gray-900 mb-4">
+                                        Price: ${{ cart_item.product.price }}
+                                    </p>
+                                </a>
+                                
+                                <div class="cart-controls flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex items-center border-gray-900">
+                                            <button class="decrease-cart px-4 py-2 bg-gray-100 hover:bg-accent hover:text-white transition-colors font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">
+                                                −
+                                            </button>
+                                            <span class="quantity-display px-6 py-2 bg-white font-bold">{{ cart_item.quantity }}</span>
+                                            <button class="increase-cart px-4 py-2 bg-gray-100 hover:bg-accent hover:text-white transition-colors font-bold" data-product-id="{{ cart_item.product.id }}" data-max-stock="{{ cart_item.product.quantity }}">
+                                                +
+                                            </button>
+                                        </div>
+                                        <span class="stock-info text-sm text-gray-600">({{ cart_item.product.quantity }} available)</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-6">
+                                        <p class="text-2xl font-bold text-gray-900">
+                                            $<span class="item-total">{{ cart_item.total_price }}</span>
+                                        </p>
+                                        <button class="remove-cart text-sm font-medium uppercase tracking-wide text-gray-600 hover:text-red-600 transition-colors" data-product-id="{{ cart_item.product.id }}">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="flex justify-end">
+                <form action="{% url "orders:place_order" %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="px-12 py-4 bg-accent text-white font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors text-lg">
+                        Proceed to Checkout
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="bg-white border border-gray-900 p-16 text-center">
+                <p class="text-xl text-gray-600 mb-8">Your cart is empty</p>
+                <a href="{% url "products:tree_list" %}" class="inline-block px-8 py-4 bg-accent text-white font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors">
+                    Continue Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
 </main>
 
 <script type="text/javascript">
+    // Get CSRF token from cookie (Django's default method)
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -77,91 +101,199 @@
     }
     
     const csrftoken = getCookie('csrftoken');
-
+    
+    // Helper function to send cart updates
     function updateCart(url, productId, quantity = null) {
         const formData = new FormData();
         formData.append('product_id', productId);
         formData.append('csrfmiddlewaretoken', csrftoken);
         formData.append('action', 'post');
-        if (quantity !== null) formData.append('quantity', quantity);
-
+        
+        if (quantity !== null) {
+            formData.append('quantity', quantity);
+        }
+        
         return fetch(url, {
             method: 'POST',
             body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         })
         .then(response => {
-            if (!response.ok) return response.json().then(data => { throw new Error(data.error || 'Request failed'); });
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Request failed');
+                });
+            }
             return response.json();
         });
     }
-
+    
+    // Helper function to update UI
     function updateCartUI(productId, data) {
         const card = document.querySelector(`.card[data-product-id="${productId}"]`);
-        if (!card) return;
+        
+        if (!card) {
+            console.error('Card not found for product:', productId);
+            return;
+        }
+        
         if (data.quantity !== undefined) {
             const qtyDisplay = card.querySelector('.quantity-display');
             const itemTotal = card.querySelector('.item-total');
+            
             if (qtyDisplay) qtyDisplay.textContent = data.quantity;
             if (itemTotal) itemTotal.textContent = parseFloat(data.item_total).toFixed(2);
         }
+        
         if (data.cart_total !== undefined) {
             const cartTotal = document.getElementById('cart-total');
             if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
         }
     }
-
-    function updateHeaderCartCount(cartHeaderId, quantity) {
+    
+    function updateHeaderCartCount(cartHeaderId, quantity)
+    {
         const cartHeader = document.getElementById(cartHeaderId);
-        if (cartHeader) cartHeader.textContent = `Cart (${quantity})`;
+        if (!cartHeader) {
+            console.error('Cart element not found by id: ', cartHeaderId);
+            return;
+        }
+        cartHeader.textContent = `Cart (${quantity})`
     }
-
+    
+    // Increase quantity
     document.querySelectorAll('.increase-cart').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            
             const productId = this.dataset.productId;
             const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            
+            if (!card) {
+                console.error('Card not found');
+                return;
+            }
+            
             const qtyDisplay = card.querySelector('.quantity-display');
             const currentQty = parseInt(qtyDisplay.textContent);
             const maxStock = parseInt(this.dataset.maxStock);
-            if (currentQty >= maxStock) { alert('Not enough stock available'); return; }
+            
+            if (currentQty >= maxStock) {
+                alert('Not enough stock available');
+                return;
+            }
+            
             const newQty = currentQty + 1;
+            
             updateCart('{% url "cart:cart_update" %}', productId, newQty)
-                .then(data => { if (data.success) { updateCartUI(productId, data); updateHeaderCartCount('cart-header', data.cart_count); } else { alert(data.error); } });
+                .then(data => {
+                    if (data.success) {
+                        updateCartUI(productId, data);
+                        updateHeaderCartCount('cart-header', data.cart_count);
+                    } 
+                    else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update cart: ' + error.message);
+                });
         });
     });
-
+    
+    // Decrease quantity
     document.querySelectorAll('.decrease-cart').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            
             const productId = this.dataset.productId;
             const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            
+            if (!card) {
+                console.error('Card not found');
+                return;
+            }
+            
             const qtyDisplay = card.querySelector('.quantity-display');
             const currentQty = parseInt(qtyDisplay.textContent);
             const newQty = currentQty - 1;
+            
             if (newQty <= 0) {
                 if (confirm('Remove this item from cart?')) {
-                    updateCart('{% url "cart:cart_delete" %}', productId).then(data => {
-                        if (data.success) { card.remove(); document.getElementById('cart-total').textContent = parseFloat(data.cart_total).toFixed(2); if (data.cart_count === 0) location.reload(); }
-                    });
+                    updateCart('{% url "cart:cart_delete" %}', productId)
+                        .then(data => {
+                            if (data.success) {
+                                card.remove();
+                                const cartTotal = document.getElementById('cart-total');
+                                if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
+                                
+                                // Check if cart is empty
+                                if (data.cart_count === 0) {
+                                    location.reload();
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Failed to remove item: ' + error.message);
+                        });
                 }
                 return;
             }
-            updateCart('{% url "cart:cart_update" %}', productId, newQty).then(data => {
-                if (data.success) { updateCartUI(productId, data); updateHeaderCartCount('cart-header', data.cart_count); } else { alert(data.error); }
-            });
+            
+            updateCart('{% url "cart:cart_update" %}', productId, newQty)
+                .then(data => {
+                    if (data.success) {
+                        updateCartUI(productId, data);
+                        updateHeaderCartCount('cart-header', data.cart_count);
+                    } 
+                    else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update cart: ' + error.message);
+                });
         });
     });
-
+    
+    // Remove from cart
     document.querySelectorAll('.remove-cart').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            
             const productId = this.dataset.productId;
             const card = document.querySelector(`.card[data-product-id="${productId}"]`);
+            
+            if (!card) {
+                console.error('Card not found');
+                return;
+            }
+            
             if (confirm('Remove this item from cart?')) {
-                updateCart('{% url "cart:cart_delete" %}', productId).then(data => {
-                    if (data.success) { card.remove(); document.getElementById('cart-total').textContent = parseFloat(data.cart_total).toFixed(2); if (data.cart_count === 0) location.reload(); }
-                });
+                updateCart('{% url "cart:cart_delete" %}', productId)
+                    .then(data => {
+                        if (data.success) {
+                            card.remove();
+                            const cartTotal = document.getElementById('cart-total');
+                            if (cartTotal) cartTotal.textContent = parseFloat(data.cart_total).toFixed(2);
+                            
+                            if (data.cart_count === 0) {
+                                location.reload();
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to remove item: ' + error.message);
+                    });
             }
         });
     });
