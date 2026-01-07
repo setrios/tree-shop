@@ -10,9 +10,9 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for tree in object_list %}
-                <a href="{% url "products:tree_detail" tree.id %}" class="group block bg-white border border-gray-900 hover:border-accent transition-all">
+                <a href="{% url "products:tree_detail" tree.id %}" class="group block bg-white border-gray-900 transition-all">
                     <div class="border-gray-900 overflow-hidden">
-                        <img src="{{ tree.image.url }}" alt="{{ tree.name }}" class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="{{ tree.image.url }}" alt="{{ tree.name }}" class="w-full h-80 object-cover transition-transform duration-300">
                     </div>
                     
                     <div class="p-6">
