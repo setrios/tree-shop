@@ -1,3 +1,6 @@
+
+{% load tailwind_filters %}
+
 <aside class="w-64 bg-white border-r border-gray-900 p-6 min-h-screen">
     <form method="get">
         <h2 class="text-xl font-bold uppercase tracking-tight mb-6 pb-4 border-b border-gray-900">
@@ -5,7 +8,7 @@
         </h2>
         
         <div class="space-y-6">
-            {{ filter_form.as_p }}
+            {{ filter_form|crispy }}
         </div>
         
         <button type="submit" class="w-full mt-8 px-6 py-3 bg-accent text-white font-medium uppercase tracking-wide hover:bg-gray-900 transition-colors">
@@ -13,45 +16,3 @@
         </button>
     </form>
 </aside>
-
-<style>
-    aside form p {
-        margin-bottom: 1.5rem;
-    }
-    
-    aside form label {
-        display: block;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #374151;
-        margin-bottom: 0.5rem;
-    }
-    
-    aside form input[type="text"],
-    aside form input[type="number"],
-    aside form select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 2px solid #e5e7eb;
-        background-color: #f9fafb;
-        font-size: 0.875rem;
-        transition: all 0.2s;
-    }
-    
-    aside form input[type="text"]:focus,
-    aside form input[type="number"]:focus,
-    aside form select:focus {
-        outline: none;
-        border-color: #10b981;
-        background-color: white;
-    }
-    
-    aside form input[type="checkbox"] {
-        width: 1.25rem;
-        height: 1.25rem;
-        margin-right: 0.5rem;
-        accent-color: #10b981;
-    }
-</style>
